@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MoviesList</string>
+    <string name="facebook_app_id">601059094163059</string>
+<string name="fb_login_protocol_scheme">fb601059094163059</string>
+</resources>
