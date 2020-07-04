@@ -8,10 +8,9 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-// import Movie from './Movie';
 
 class PopularMovies extends Component {
-  state = {movies: [], modalVisible: false};
+  state = {movies: [], totalResults: 0, currentPage: 1, modalVisible: false};
 
   componentDidMount() {
     fetch(
@@ -23,14 +22,20 @@ class PopularMovies extends Component {
       });
   }
 
-  showMovies() {
+  showMovies = () => {
     return this.state.movies.map((movie, _i) => {
       return (
         <TouchableOpacity
           key={movie.id}
           onPress={() => {
-            this.setModalVisible(true);
-            //    his.props.navigation.navigate('Movie', { poster: movie.poster_path, });
+            // this.setModalVisible(true);
+            this.props.navigation.navigate('Movie', {
+              poster: movie.poster_path,
+              title: movie.title,
+              rating: movie.vote_average,
+              id: movie.id,
+              overview: movie.overview,
+            });
           }}>
           <Image
             source={{
@@ -41,7 +46,21 @@ class PopularMovies extends Component {
         </TouchableOpacity>
       );
     });
-  }
+  };
+
+  nextPage = (pageNumber) => {
+    fetch(
+      `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=9cdac80be2c1e1a848e45e7dfc1aca4a&language=en-US&page=${pageNumber}`,
+    )
+      .then((data) => data.json())
+      .then((data) => {
+        this.setState({
+          movies: [...data.results],
+          totalResults: data.total_results,
+          currentPage: pageNumber,
+        });
+      });
+  };
 
   setModalVisible = (visible) => {
     this.setState({modalVisible: visible});
@@ -49,11 +68,12 @@ class PopularMovies extends Component {
 
   render() {
     const {modalVisible} = this.state;
+    let numberPages = Math.floor(this.state.totalResults / 20);
     return (
       <>
         <ScrollView>
           <View style={styles.moviesGrid}>{this.showMovies()}</View>
-          <Modal
+          {/* <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}>
@@ -70,7 +90,15 @@ class PopularMovies extends Component {
                 </TouchableOpacity>
               </View>
             </View>
-          </Modal>
+          </Modal> */}
+
+          {/* {this.state.totalResults > 20 && this.state.currentMovie == null ? (
+             this.props.navigation.navigate('Pagination', {
+              pages: numberPages, nextPage: this.nextPage, currentPage: this.state.currentPage,
+            });
+          ) : (
+            ''
+          )} */}
         </ScrollView>
       </>
     );

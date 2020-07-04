@@ -1,12 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React, {useState, Component} from 'react';
+import React, {Component} from 'react';
 import {StyleSheet, View, Text, Image, TouchableOpacity} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -66,11 +58,19 @@ class Main extends Component {
     try {
       await GoogleSignin.hasPlayServices();
       console.warn('Getting only to here');
-      const userInfo = await GoogleSignin.signIn();
+      const result = await GoogleSignin.signIn();
       console.warn('Not getting here');
-      this.setState({userInfo: userInfo});
+      this.setState({userInfo: result});
     } catch (error) {
-      console.warn('Houston we have a problem');
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.warn('in progress already');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.warn('play services not available or outdated');
+      } else {
+        console.warn('some other error happened');
+      }
     }
   };
 
